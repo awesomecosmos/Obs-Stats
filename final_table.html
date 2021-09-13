@@ -1,0 +1,130 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="text/html;charset=UTF-8" http-equiv="Content-type"/>
+  <style>
+body {font-family: sans-serif;}
+table.dataTable {width: auto !important; margin: 0 !important;}
+.dataTables_filter, .dataTables_paginate {float: left !important; margin-left:1em}
+  </style>
+  <link href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js">
+  </script>
+  <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js">
+  </script>
+ </head>
+ <body>
+  <script>
+var astropy_sort_num = function(a, b) {
+    var a_num = parseFloat(a);
+    var b_num = parseFloat(b);
+
+    if (isNaN(a_num) && isNaN(b_num))
+        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    else if (!isNaN(a_num) && !isNaN(b_num))
+        return ((a_num < b_num) ? -1 : ((a_num > b_num) ? 1 : 0));
+    else
+        return isNaN(a_num) ? -1 : 1;
+}
+
+jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+    "optionalnum-asc": astropy_sort_num,
+    "optionalnum-desc": function (a,b) { return -astropy_sort_num(a, b); }
+});
+
+$(document).ready(function() {
+    $('#table2223623561544').dataTable({
+        order: [],
+        pageLength: 50,
+        lengthMenu: [[10, 25, 50, 100, 500, 1000, -1], [10, 25, 50, 100, 500, 1000, 'All']],
+        pagingType: "full_numbers",
+        columnDefs: [{targets: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], type: "optionalnum"}]
+    });
+} );  </script>
+  <table class="display compact" id="table2223623561544">
+   <thead>
+    <tr>
+     <th>datetime_str</th>
+     <th>datetime_jd</th>
+     <th>RA</th>
+     <th>DEC</th>
+     <th>RA_rate</th>
+     <th>DEC_rate</th>
+     <th>Tmag</th>
+     <th>airmass</th>
+     <th>r</th>
+     <th>r_rate</th>
+     <th>delta</th>
+     <th>delta_rate</th>
+     <th>elong</th>
+     <th>alpha</th>
+    </tr>
+   </thead>
+   <tr>
+    <td>2021-Feb-11 00:00:00.000</td>
+    <td>2459256.5</td>
+    <td>88.90726</td>
+    <td>-59.09524</td>
+    <td>-5.90996</td>
+    <td>58.03689</td>
+    <td>17.364</td>
+    <td>3.049</td>
+    <td>2.690072384172</td>
+    <td>-13.305641</td>
+    <td>2.43253560940574</td>
+    <td>-17.0606884</td>
+    <td>94.124</td>
+    <td>21.4604</td>
+   </tr>
+   <tr>
+    <td>2021-Feb-12 00:00:00.000</td>
+    <td>2459257.5</td>
+    <td>88.82707</td>
+    <td>-58.7022</td>
+    <td>-5.0658</td>
+    <td>59.10959</td>
+    <td>17.35</td>
+    <td>3.057</td>
+    <td>2.6823968079</td>
+    <td>-13.2726414</td>
+    <td>2.42279832191187</td>
+    <td>-16.8922474</td>
+    <td>94.2081</td>
+    <td>21.5267</td>
+   </tr>
+   <tr>
+    <td>2021-Feb-13 00:00:00.000</td>
+    <td>2459258.5</td>
+    <td>88.75871</td>
+    <td>-58.30198</td>
+    <td>-4.20982</td>
+    <td>60.17092</td>
+    <td>17.336</td>
+    <td>3.064</td>
+    <td>2.674740436889</td>
+    <td>-13.2391531</td>
+    <td>2.41316223864469</td>
+    <td>-16.7176028</td>
+    <td>94.287</td>
+    <td>21.5934</td>
+   </tr>
+   <tr>
+    <td>2021-Feb-18 00:00:00.000</td>
+    <td>2459263.5</td>
+    <td>88.59</td>
+    <td>-56.19586</td>
+    <td>0.21904</td>
+    <td>65.29661</td>
+    <td>17.265</td>
+    <td>3.096</td>
+    <td>2.636756713122</td>
+    <td>-13.0641863</td>
+    <td>2.36662635911453</td>
+    <td>-15.7502055</td>
+    <td>94.5978</td>
+    <td>21.9334</td>
+   </tr>
+  </table>
+ </body>
+</html>
+
