@@ -24,7 +24,7 @@ import pandas as pd
 import csv
 
 #%%
-code_path = "C:/Users/aayus/OneDrive - University of Canterbury/Master's 2021/ASTR480 Research/ASTR480 Code/Observations-Stats"
+code_path = "C:/Users/ave41/OneDrive - University of Canterbury/Master's 2021/ASTR480 Research/ASTR480 Code/Observations-Stats"
 os.chdir(code_path) #from now on, we are in this directory
 
 #%%
@@ -52,8 +52,8 @@ jpl_data = observations.ephemerides()
 
 #%%
 #now we need to make the JPL data and the FITS data into tables
-JPLtableData = jpl_data['datetime_str','datetime_jd','RA','DEC','RA_rate','DEC_rate','Tmag','airmass','r','r_rate','delta','delta_rate','elong','alpha']
-JPL_colnames = ['datetime_str','datetime_jd','RA','DEC','RA_rate','DEC_rate','Tmag','airmass','r','r_rate','delta','delta_rate','elong','alpha']
+JPLtableData = jpl_data['datetime_str','datetime_jd','RA','DEC','RA_rate','DEC_rate','Tmag','airmass','r','r_rate','delta','delta_rate','elong','alpha','constellation','EL']
+JPL_colnames = ['datetime_str','datetime_jd','RA','DEC','RA_rate','DEC_rate','Tmag','airmass','r','r_rate','delta','delta_rate','elong','alpha','constellation','EL']
 JPL_astropy_tbl = Table(JPLtableData,names=JPL_colnames)
 
 #%%
@@ -65,10 +65,24 @@ ascii.write(JPL_astropy_tbl,"final_table.csv",format="csv",overwrite=True)
 #as an HTML file
 JPL_astropy_tbl.write('final_table.html',format='jsviewer')
 #as Latex code
-ascii.write(JPL_astropy_tbl['datetime_str','airmass','r','delta','elong','alpha'],format="latex",
-           formats={
-                    'airmass':'%12.2f',
-                    'r':'%12.2f',
+# ascii.write(JPL_astropy_tbl['datetime_str','airmass','r','delta','elong','alpha'],format="latex",
+#            formats={
+#                     'airmass':'%12.2f',
+#                     'r':'%12.2f',
+#                     'delta':'%12.2f',
+#                     'elong':'%12.2f',
+#                     'alpha':'%12.2f'})
+
+# ascii.write(JPL_astropy_tbl['datetime_str','Tmag','airmass','EL','r','delta','elong','alpha'],format="latex",
+#            formats={
+#                     'airmass':'%12.2f',
+#                     'r':'%12.2f',
+#                     'delta':'%12.2f',
+#                     'elong':'%12.2f',
+#                     'alpha':'%12.2f'})
+
+ascii.write(JPL_astropy_tbl['datetime_str','Tmag','r','delta','elong','alpha'],format="latex",
+           formats={'r':'%12.2f',
                     'delta':'%12.2f',
                     'elong':'%12.2f',
                     'alpha':'%12.2f'})
@@ -80,6 +94,8 @@ t = []
 e = []
 a = []
 m = []
+airmass = []
+alt = []
 for eph in eph_lst:
     r.append(eph['r'])
     d.append(eph['delta'])
@@ -87,6 +103,8 @@ for eph in eph_lst:
     e.append(eph['elong'])
     a.append(eph['alpha'])
     m.append(eph['Tmag'])
+    airmass.append(eph['airmass'])
+    alt.append(eph['EL'])
 
 plt.figure()
 plt.plot(obsDate_lst_for_display,m,"*",color="darkviolet")
@@ -130,4 +148,24 @@ plt.title("Geometry of {} in relation to elongation and phase angles".format(tar
 plt.legend()
 plt.grid(alpha=0.3)
 plt.savefig("{}_elong_alpha.jpeg".format(target_name.replace("/","").replace(" ","_")),dpi=900)
+plt.show()
+
+#%%
+# # now we want to see how close to sunrise the observations were made
+# #getting alt/az info for the Sun at time/location of observation
+# utc_observe_time = Time(JPL_astropy_tbl['obs_date'],format='isot', scale='utc')
+# paranal = Observer.at_site('474', timezone="UTC")
+# sun_altaz_data = paranal.sun_altaz(utc_observe_time) 
+# altitudes = sun_altaz_data.alt.value #getting only the altitude value of the sun
+# altitudes
+
+# plot to demonstrate relationship between altitude and airmass
+plt.figure()
+plt.plot(airmass,alt,"^",color="darkorchid",label="altitude")
+plt.xlabel("airmass")
+plt.ylabel("altitude (deg)")
+plt.title("Relationship between airmass and altitude")
+plt.legend()
+plt.grid(alpha=0.3)
+plt.savefig("{}_airmass_altitude_relationship.jpeg".format(target_name.replace("/","").replace(" ","_")),dpi=900)
 plt.show()
