@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 ###############################################################################
 #---------------------MOA-CAM3 CHIP SIZE CALCULATIONS-------------------------#
 ###############################################################################
@@ -31,3 +30,27 @@ chip_width_deg = chip_width_arcmin / 60
 chip_area_arcsec = chip_length_arcsec * chip_width_arcsec
 chip_area_arcmin = chip_length_arcmin * chip_width_arcmin
 chip_area_deg = chip_length_deg * chip_width_deg
+
+def arcsec_to_pixel(arcsec_diameter):
+    """
+    Function to convert the radius of a target (in arcsec) to the corresponding
+    radius (in pixels) for a MOA-cam3 CCD chip.
+
+    Parameters
+    ----------
+    arcsec_diameter : float
+        Diameter of target, in arcseconds.
+
+    Returns
+    -------
+    pixel_radius : float
+        Radius of target, in pixels correponding to a MOA-cam3 CCD chip.
+    """
+    arcsec_radius = arcsec_diameter / 2
+    # area of 1 pixel (pixel size) = (15 * 10 ** -6) m^2
+    pixel_size = 0.58 #arcsec squared
+    # dimensions of 1 pixel (assuming square pixel shape)
+    pixel_side = np.sqrt(pixel_size)
+    pixel_radius = arcsec_radius * pixel_side
+    
+    return pixel_radius
