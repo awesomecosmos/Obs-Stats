@@ -24,7 +24,7 @@ import pandas as pd
 import csv
 
 #%%
-code_path = "C:/Users/ave41/OneDrive - University of Canterbury/Master's 2021/ASTR480 Research/ASTR480 Code/Observations-Stats"
+code_path = "C:/Users/ave41/OneDrive - University of Canterbury/ASTR480 Research/ASTR480 Code/02 Data Analysis/Observations-Stats"
 os.chdir(code_path) #from now on, we are in this directory
 
 #%%
@@ -105,17 +105,19 @@ for eph in eph_lst:
     m.append(eph['Tmag'])
     airmass.append(eph['airmass'])
     alt.append(eph['EL'])
-
+#%%
 plt.figure()
+# for i in range(len(obsDate_lst_for_display)):
+#     plt.plot(obsDate_lst_for_display[i],m[i],"*",label=obsDate_lst_for_display[i])
 plt.plot(obsDate_lst_for_display,m,"*",color="darkviolet")
 plt.xlabel("date")
 plt.ylabel("apparent magnitude of {}".format(target_name))
-plt.title("Apparent Magnitude of {}".format(target_name))
-plt.legend()
+plt.title("Predicted Apparent Magnitude of {}".format(target_name))
+# plt.legend()
 plt.grid(alpha=0.3)
 plt.savefig("{}_mag.jpeg".format(target_name.replace("/","").replace(" ","_")),dpi=900)
 plt.show()
-
+#%%
 #combo plot of (d vs t) and (r vs t)
 #(where d is distance from Earth in AU, r is distance from sun in AU, and t is time in Julian date)
 plt.figure()
