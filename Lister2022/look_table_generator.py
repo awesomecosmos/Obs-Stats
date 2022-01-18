@@ -56,6 +56,7 @@ for index,jdDate in enumerate(jd_obsDate_lst):
 yolo = obj_lst[1]
 print(yolo)
 print(yolo.elements())
+
 # for i in obj_lst:
 #     try:
 #         print(i.elements())
