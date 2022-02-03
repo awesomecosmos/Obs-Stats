@@ -1,6 +1,7 @@
 # Observations-Stats
-A quick function to calculate statistics of my MSc Astronomy observations.
- 
-It is often useful to calculate quick statistics of observations I have made for my MSc Astronomy research. This repo contains the required functions to calculate those statistics.
- 
- **Status:** development in progress.
+
+Functions and scripts for calculating statistics for my astronomy observations and research.
+
+## Motivation
+
+It is often useful to calculate quick statistics of observations I have made for my research in astronomy. This repo contains the required functions to calculate those statistics.
