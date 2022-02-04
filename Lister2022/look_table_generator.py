@@ -15,19 +15,24 @@ import astropy.time
 import dateutil.parser
 
 ### Reading CSV file of dates targets were observed
-raw_target_info = pd.read_csv("Lister2022/look_table.csv")
+raw_target_info = pd.read_csv("input_obs_data.csv")
 
 ### Creating new dataframe with first date each target was observed
 subset_df = raw_target_info[["Target","Date"]]
 grouped_and_first_df = subset_df.groupby(["Target"]).first()
-new_df = grouped_and_first_df.reset_index()
-new_df.columns = ["Name","N"]
+grouped_and_first_df["N"] = subset_df.groupby(["Target"]).nunique()
+grouped_and_first_df
 
-### 
+### Creating new dataframe with target name, date it was first observed, and N
+new_df = grouped_and_first_df.reset_index()
+new_df.columns = ["Name","first_date","N"]
+new_df.tail(5)
+
+### Preparation for querying data from JPL Horizons
 target_location = '474' # Mt. John Observatory MPC code
 
 obsDate_lst = []
-for i in new_df.N:
+for i in new_df["first_date"]:
     obsDate_lst.append(i)
 
 targetname_lst = []
@@ -41,45 +46,45 @@ for i in obsDate_lst:
     time = astropy.time.Time(dt)
     jd_obsDate_lst.append(time.jd)
 
-
-# statue_of_liberty = {'lon': -74.0466891,
-#                      'lat': 40.6892534,
-#                      'elevation': 0.093}
-
-# obj = Horizons(id='Eris',epochs=jd_obsDate_lst[0])
-# print(obj.elements())
-# print(obj.location)
-
-
-
-# #need to query information from JPL Horizons database
+### Querying information from JPL Horizons database
 eph_lst = []
 el_lst = []
 obj_lst = []
 for index,jdDate in enumerate(jd_obsDate_lst):
-    if targetname_lst[index] == "C/2018 F4":
-        obj = Horizons(id='90004395', location=target_location,epochs=jdDate)
+    # setting an exception for C/2018 F4 because it has fragmented and gives an error otherwise
+    if targetname_lst[index] == "C/2018 F4": 
+        obj = Horizons(id='90004395', epochs=jdDate)
+        eph_lst.append(obj.ephemerides()) #from eph, only need 'r' heliocentric distance
+        el_lst.append(obj.elements()) #from elems, need a0 (semimajor axis), q, and T (perihelion date)
     else:
         obj = Horizons(id=targetname_lst[index], epochs=jdDate)
-        # obj_lst.append(obj)
+        obj_lst.append(obj)
         eph_lst.append(obj.ephemerides()) #from eph, only need 'r' heliocentric distance
         el_lst.append(obj.elements()) #from elems, need a0 (semimajor axis), q, and T (perihelion date)
 
-print(eph_lst[0])
+# to check elements returned by obj.elements, see:
+# https://astroquery.readthedocs.io/en/latest/api/astroquery.jplhorizons.HorizonsClass.html#astroquery.jplhorizons.HorizonsClass.elements
 
+### Combining ephemerides and elements info into single array
+final_array = []
+for index,target in enumerate(eph_lst):
+    final_array.append([el_lst[index]['a'][0],eph_lst[index]['r'][0],
+                        el_lst[index]['q'][0],el_lst[index]['Tp_jd'][0]])
 
-# elements_info = obj_lst[1]
-# print(elements_info)
-# print(elements_info.elements())
+### Converting array to dataframe and formatting
+eph_el_df = pd.DataFrame(final_array,columns=['a','r','q','T'])
+final_new_df = pd.concat([new_df,eph_el_df],axis=1)
+final_new_df = final_new_df[['Name','first_date','a','N','r','q','T']]
+final_new_df['T'] = final_new_df['T'].map(lambda name: Time(name, format='jd').to_value('iso')[:10])
+final_new_df['a'] = np.round(final_new_df['a'], decimals = 6)
+final_new_df['r'] = np.round(final_new_df['r'], decimals = 2)
+final_new_df['q'] = np.round(final_new_df['q'], decimals = 2)
+final_new_df = final_new_df.drop(columns="first_date")
+final_column_names = ['Name','$a_0$ [au]','N','$r_0$ [au]','$q$ [au]','T']
+final_new_df.columns = final_column_names
 
-# for i in obj_lst:
-#     try:
-#         print(i.elements())
-#     except:
-#         pass
-# print(el_lst)
-
-#now we need to make the JPL data and the FITS data into tables
-JPLtableData = eph_lst['r']
-JPL_colnames = ['r']
-JPL_astropy_tbl = Table(JPLtableData,names=JPL_colnames)
+### Writing as CSV and Latex
+final_new_df.to_csv("final_look_table.csv")
+final_look_table = Table.from_pandas(final_new_df)
+ascii.write(final_look_table,format="latex",
+            formats={'$a_0$ [au]':'%12.6f'})
