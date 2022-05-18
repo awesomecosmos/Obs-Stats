@@ -1,4 +1,5 @@
-#importing useful packages
+# importing useful packages
+import glob, os, sys
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
@@ -14,8 +15,11 @@ import csv
 import astropy.time
 import dateutil.parser
 
+filepath = "/Users/aayushiverma/Github/Obs-Stats/Lister2022" 
+os.chdir(filepath)
+
 ### Reading CSV file of dates targets were observed
-raw_target_info = pd.read_csv("Lister2022\input_obs_data.csv")
+raw_target_info = pd.read_csv("input_obs_data.csv")
 
 ### Creating new dataframe with first date each target was observed
 subset_df = raw_target_info[["Target","Date"]]
